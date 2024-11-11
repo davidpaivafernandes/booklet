@@ -10,7 +10,7 @@ $File = $args[0]
 $BookletSize = [int]$args[1]
 $Output = $args[2]
 
-if ($args.length -le 2) {
+if ($args.length -ne 3) {
     write-host "booklet.ps1"
     write-host "-------------------------------------------------"
     write-host "usage:"
