@@ -2,13 +2,12 @@
 #
 # Author: david.paiva.fernandes@gmail,com
 #
-# Date: 2024-11-11
-
+# Date: 2023-11-11
 
 Set-PSDebug -Trace 0
 
 $File = $args[0]
-$BlocketSize = [int]$args[1]
+$BookletSize = [int]$args[1]
 $Output = $args[2]
 
 if ($args.length -le 2) {
@@ -28,28 +27,28 @@ New-Item -Type Directory -Path $TempPath | Out-Null
 $Pages = [int](pdfinfo $File | Select-String -Pattern "(?<=Pages:\s*)\d+").Matches.Value
 
 # finds the size of the last booklet
-$LastBlocketSize = $Pages % $BlocketSize
+$LastBookletSize = $Pages % $BookletSize
 
 # in order to calc the additional blabnk pages needed in the end
 $AdditionalBlankPages = 0
 
-if ($LastBlocketSize -ne 0) {
-	$AdditionalBlankPages = $BlocketSize - $LastBlocketSize
+if ($LastBookletSize -ne 0) {
+	$AdditionalBlankPages = $BookletSize - $LastBookletSize
 }
 
 $TotalPages = $Pages + $AdditionalBlankPages
-$Blockets = $TotalPages / $BlocketSize
+$Booklets = $TotalPages / $BookletSize
 
 $BlankFile = Join-Path $TempPath "blank.pdf"
 
 write-host "TempDir............: ", $TempPath
-write-host "BlocketSize........: ", $BlocketSize
+write-host "BookletSize........: ", $BookletSize
 write-host "File...............: ", $File
 write-host "Pages..............: ", $Pages
-write-host "LastBlocketSize....: ", $LastBlocketSize
+write-host "LastBookletSize....: ", $LastBookletSize
 write-host "AdditionalPage(s)..: ", $AdditionalBlankPages
 write-host "TotalPage(s).......: ", $TotalPages
-write-host "Blocket(s).........: ", $Blockets
+write-host "Booklet(s).........: ", $Booklets
 
 write-host "Blank file.........: ", $BlankFile
 
@@ -78,18 +77,18 @@ write-host "--------------------"
 pdftk $File burst output (Join-Path $TempPath "Pages_%04d.pdf")
 Remove-Item (Join-Path $TempPath doc_data.txt)
 
-# creates each blocket
-$BlocketNames = ""
+# creates each Booklet
+$BookletNames = ""
 
-for (($b = 1); $b -le $Blockets; $b++)
+for (($b = 1); $b -le $Booklets; $b++)
 {
 	$List = ""
 
-	for (($i = 1); $i -le ($BlocketSize / 4); $i++)
+	for (($i = 1); $i -le ($BookletSize / 4); $i++)
 	{
-		$x = ($b - 1) * $BlocketSize
+		$x = ($b - 1) * $BookletSize
 		$p1 = $x + $i * 2
-		$p2 = $x + $BlocketSize - (($i-1) * 2) - 1
+		$p2 = $x + $BookletSize - (($i-1) * 2) - 1
 		$p3 = $p2 + 1
 		$p4 = $p1 - 1
 		$List = $List + " " + (Join-Path $TempPath ($p1 | % tostring Pages_0000\.pdf))  + " " + (Join-Path $TempPath ($p2 | % tostring Pages_0000\.pdf)) + " " + (Join-Path $TempPath ($p3 | % tostring Pages_0000\.pdf)) + " " + (Join-Path $TempPath ($p4 | % tostring Pages_0000\.pdf)) + " "
@@ -97,20 +96,20 @@ for (($b = 1); $b -le $Blockets; $b++)
 
 	$List = $List -replace '\s+', ' '
 	
-	$NewBlocket = Join-Path $TempPath ("Booklet_" + $b + ".pdf")
-	write-host "New blocket: " $NewBlocket
+	$NewBooklet = Join-Path $TempPath ("Booklet_" + $b + ".pdf")
+	write-host "New Booklet: " $NewBooklet
 
-	$BlocketNames = $BlocketNames + " " + $NewBlocket
+	$BookletNames = $BookletNames + " " + $NewBooklet
 
-	# creates the blocket pdf
-    pdftk $List.Split(" ") cat output $NewBlocket
+	# creates the Booklet pdf
+    pdftk $List.Split(" ") cat output $NewBooklet
 	
 }
 
-$BlocketNames = $BlocketNames -replace '\s+', ' '
+$BookletNames = $BookletNames -replace '\s+', ' '
 
-# join sall blockets in a single PDF file.
-pdftk $BlocketNames.Split(" ") cat output $Output
+# join sall Booklets in a single PDF file.
+pdftk $BookletNames.Split(" ") cat output $Output
 
 Remove-Item (Join-Path $TempPath Pages_*.pdf)
 Remove-Item (Join-Path $TempPath Booklet_*.pdf)
