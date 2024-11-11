@@ -9,7 +9,7 @@ I use normally 32 pages booklets but you're free to use whatever size suits your
 
 In the media folder are some pictures of some of the book I've made with this thing.
 
-The final PDF can be printed completely selecting two pages per side, front&back by the shorter size.
+The final PDF can be printed as a whole on one go, selecting two pages per side, and front&back by the shorter size.
 
 ## You'll also need
 
